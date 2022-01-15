@@ -1,24 +1,23 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using my_books.Data;
+using my_books.Data.Contracts;
+using my_books.Data.Services;
 
 namespace my_books
 {
     public class Startup
     {
+        public string ConnectionString { get; set; }
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            ConnectionString = Configuration.GetConnectionString("DefaultConnectionString");
         }
 
         public IConfiguration Configuration { get; }
@@ -26,7 +25,12 @@ namespace my_books
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddAutoMapper(typeof(Startup));
+            services.AddDbContext<AppDbContext>(option => option.UseSqlServer(ConnectionString));
+            services.AddTransient<IBooksService ,BooksService>();
+            services.AddTransient<IAuthorsService , AuthorsService>();
+            services.AddTransient<IPublishersService , PublishersService>();
+            services.AddTransient<IResponseModel,ResponseModel>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -54,6 +58,8 @@ namespace my_books
             {
                 endpoints.MapControllers();
             });
+
+            AppDbInitializer.Seed(app);
         }
     }
 }
