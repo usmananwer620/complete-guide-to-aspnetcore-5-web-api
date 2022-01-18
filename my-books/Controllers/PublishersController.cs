@@ -36,7 +36,14 @@ namespace my_books.Controllers
         [HttpDelete("delete/{id}")]
         public IActionResult DeletePublisher(int id)
         {
-            return Ok(_publishersService.DeletePublisher(id));
+            try
+            {
+                return Ok(_publishersService.DeletePublisher(id));
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("get-publisher-by-id/{id}")]
@@ -48,8 +55,16 @@ namespace my_books.Controllers
         [HttpGet("get-publisher-with-books-and-author/{id}")]
         public IActionResult GetPublisherWithBooksAndAuthor(int id)
         {
-            var publisherWithBooksAndAuthor = _publishersService.GetPublisherWithBooksAndAuthor(id);
-            return Ok(publisherWithBooksAndAuthor);
+            try
+            {
+                var publisherWithBooksAndAuthor = _publishersService.GetPublisherWithBooksAndAuthor(id);
+                return Ok(publisherWithBooksAndAuthor);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
     }
 }

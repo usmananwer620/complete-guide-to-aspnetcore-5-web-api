@@ -46,6 +46,10 @@ namespace my_books.Data.Services
                     _responseModel.Message = $"Publisher with ID {publisherId} has been deleted successfully!";
                 }
             }
+            else
+            {
+                throw new System.Exception($"Publisher with ID {publisherId} is not found to delete");
+            }
 
             return _responseModel;
         }
@@ -65,7 +69,7 @@ namespace my_books.Data.Services
 
         public object GetPublisherWithBooksAndAuthor(int id)
         {
-            return _context.Publishers.Where(n => n.ID == id)
+            _responseModel.DataObject = _context.Publishers.Where(n => n.ID == id)
                 .Select(n => new PublisherVM()
                 {
                     Name = n.Name,
@@ -75,6 +79,10 @@ namespace my_books.Data.Services
                         BooksAuthors = n.Author_Books.Select(n => n.Author.FullName).ToList()
                     }).ToList()
                 }).FirstOrDefault();
+            if (_responseModel.DataObject == null)
+                throw new System.Exception($"Record not found for ID: {id}");
+
+            return _responseModel;
         }
 
 
